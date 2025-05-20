@@ -1,4 +1,3 @@
 
-NODE_MODULES
-package.json
-package-lock.json
+node_modules/
+#https://book-mgt-app.onrender.com

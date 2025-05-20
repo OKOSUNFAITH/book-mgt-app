@@ -1,22 +1,26 @@
 const express = require ('express')
 const app = express()
+;
 
 const PORT = 3000;
 
 const books = [
-    {id: 1, title:'the old woman', desc:'kids'},
-    {id: 2, title:'Storm', desc:'Adults'},
-    {id: 3, title:'hello', desc:'teens'},
-    {id: 4, title:'sunrise', desc:'kids'},
+    {id: 1, title:'the old woman', desc:'kids', author:'John'},
+    {id: 2, title:'Storm', desc:'Adults', author:'Jane'},
+    {id: 3, title:'hello', desc:'teens', author:'Doe'},
+    {id: 4, title:'sunrise', desc:'kids', author:'Smith'},
 ]
+const users = [];
+ 
 
 app.use(express.json());
+
 app.get('/books/', (req, res)=>{
     res.send(books);
     
 })
 
-app.get('/books/:id', (req,res)=>{
+app.get('/books/:id', (req, res)=>{
     console.log(req.params.id);
 
     const book = books.filter((book)=> book.id == req.params.id);
@@ -57,7 +61,20 @@ app.put('/books/:id', (req, res) => {
           res.json(book);
     })
 
+app.post('/sign-up', (req, res) => {
+    const { username, email, password } = req.body;
+    const users = users.find(u => u.username === username);
+    if (users) {
+        return res.status(400).json({ message: 'User already exists' });
+    }
+    if (!username || !email || !password) {
+        return res.status(400).json({ message: 'All fields are required' });
+    }
+       
 
+    res.status(201).json({ message: 'User created', user: { username } });
+}
+);
 
 
 
