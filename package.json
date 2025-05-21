@@ -8,9 +8,20 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-     "start": "node index.js"
+    "start": "node index.js"
   },
   "dependencies": {
-    "express": "^5.1.0"
-  }
+    "bcryptjs": "^3.0.2",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://OKOSUNFAITH@github.com/OKOSUNFAITH/book-mgt-app.git"
+  },
+  "keywords": [],
+  "bugs": {
+    "url": "https://github.com/OKOSUNFAITH/book-mgt-app/issues"
+  },
+  "homepage": "https://github.com/OKOSUNFAITH/book-mgt-app#readme"
 }
