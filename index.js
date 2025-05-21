@@ -7,10 +7,10 @@ const PORT = 3000;
 app.use(express.json());
 
 const books = [
-    {id: 1, title:'the old woman', desc:'kids', author:'John'},
-    {id: 2, title:'Storm', desc:'Adults', author:'Jane'},
-    {id: 3, title:'hello', desc:'teens', author:'Doe'},
-    {id: 4, title:'sunrise', desc:'kids', author:'Smith'},
+    // {id: 1, title:'the old woman', desc:'kids', author:'John'},
+    // {id: 2, title:'Storm', desc:'Adults', author:'Jane'},
+    // {id: 3, title:'hello', desc:'teens', author:'Doe'},
+    // {id: 4, title:'sunrise', desc:'kids', author:'Smith'},
 ]
 const users = [];
 const JWT_SECRET="secret" ;
@@ -31,11 +31,25 @@ app.get('/books/:id', (req, res)=>{
 })
 
 app.post('/books/', (req, res) => {
+    let token;
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+            token = req.headers.authorization.split(' ')[1];
+        } 
+        if (!token) {
+            return res.status(401).json({ message: 'Unauthorized' });
+        }
+        const decoded = jwt.verify(token, JWT_SECRET);
+        const user = users.find(user => user.email === decoded.email);
+        if (!user) {
+            return res.status(401).json({ message: 'Unauthorized' });
+        }
+        req.user = user;
+
     const newBook = {
         id: books.length + 1,
         title: req.body.title,
         desc: req.body.desc,
-        author: req.body.author
+        author: req.user.username
     };
     books.push(newBook);
     res.json(newBook);
@@ -43,13 +57,34 @@ app.post('/books/', (req, res) => {
 })
 
 app.put('/books/:id', (req, res) => {
-    const book = books.find((book) => book.id == req.params.id);
+
+    let token;
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+            token = req.headers.authorization.split(' ')[1];
+        } 
+        if (!token) {
+            return res.status(401).json({ message: 'Unauthorized' });
+        }
+        const decoded = jwt.verify(token, JWT_SECRET);
+        const user = users.find(user => user.email === decoded.email);
+        if (!user) {
+            return res.status(401).json({ message: 'Unauthorized' });
+        }
+        req.user = user;
+
+    const book = books.find((book) => book.id == parseInt(req.params.id));
     if(!book){
-        return res.status(404).send("Book not found");
+        return res.status(404).json("Book not found");
+
+      }
+      if(book.author !== req.user.username){
+        return res.status(403).json("You are not authorized to update this book");
       }
  
       book.title = req.body.title;
       book.desc = req.body.desc;
+      book.author = req.user.username;
+
       res.json(book);
     });
 
@@ -58,13 +93,16 @@ app.put('/books/:id', (req, res) => {
         if(!book){
             return res.status(404).send("Book not found");
           }
+            if(book.author !== req.user.username){
+                return res.status(403).json({ message: "You are not authorized to delete this book" });
+            }
      
           const index = books.indexOf(book);
           books.splice(index, 1);
           res.json(book);
     })
 
-app.post('/books/sign-up', async(req, res) => {
+    app.post('/books/register', async(req, res) => {
     const { username, email, password } = req.body;
     const userExist = users.find(user => user.email === email);
     if (userExist) {
@@ -91,7 +129,7 @@ app.post('/books/sign-up', async(req, res) => {
 )
 
  
-app.post('/books/sign-in', async(req, res) => {
+ app.post('/books/sign-in', async(req, res) => {
     const {  email, password } = req.body;
     const userExist = users.find(user => user.email === email);
     if (!userExist) {
@@ -106,8 +144,10 @@ app.post('/books/sign-in', async(req, res) => {
         JWT_SECRET,
         { expiresIn: '1h' }
     );
-    res.status(200).json({ message: 'User signed in successfully', token , user: { username: userExist.username, email: userExist.email } });
-});
+    res.status(200).json({ message: 'User signed in successfully', 
+         token ,
+         user: { username: userExist.username, email: userExist.email } });
+ });
 
 
 
