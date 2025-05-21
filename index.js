@@ -6,12 +6,7 @@ const app = express();
 const PORT = 3000;
 app.use(express.json());
 
-const books = [
-    // {id: 1, title:'the old woman', desc:'kids', author:'John'},
-    // {id: 2, title:'Storm', desc:'Adults', author:'Jane'},
-    // {id: 3, title:'hello', desc:'teens', author:'Doe'},
-    // {id: 4, title:'sunrise', desc:'kids', author:'Smith'},
-]
+const books = [];
 const users = [];
 const JWT_SECRET="secret" ;
 
